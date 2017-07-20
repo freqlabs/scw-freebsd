@@ -242,5 +242,35 @@ patch -u -p2 -d "${root_mnt}" < repo/patches/bsdconfig.patch
 #
 
 mkdir -p "${img_mnt}/boot/kernel"
-#cp -a "${root_mnt}/boot/
-# TODO: everything else
+cp -a "${root_mnt}/boot/kernel/kernel" "${img_mnt}/boot/kernel/"
+cp -a \
+   "${root_mnt}/boot/defaults" \
+   "${root_mnt}/boot/loader" \
+   "${root_mnt}/boot/loader.rc" \
+   "${root_mnt}/boot/loader.4th" \
+   "${root_mnt}/boot/support.4th" \
+   "${root_mnt}/boot/color.4th" \
+   "${root_mnt}/boot/delay.4th" \
+   "${root_mnt}/boot/check-password.4th" \
+   "${root_mnt}/boot/screen.4th" \
+   "${img_mnt}/boot/"
+cp repo/examples/loader.conf.install "${img_mnt}/boot/loader.conf"
+cp repo/examples/boot.config "${img_mnt}/"
+
+# TODO:
+echo
+echo
+echo "ATTENTION:"
+echo
+echo "installer root fs is mounted at ${root_mnt}"
+echo "make customizations and unmount the fs"
+echo "then detach the disk image (${root_md})"
+echo "compress the image file (${TMP_DIR}/rootfs) with gzip"
+echo "copy it to the installer boot fs mounted at ${img_mnt}"
+echo "unmount the boot fs"
+echo "detach the disk image (${img_md})"
+echo "copy the image file (${TMP_DIR}/install.img) to your boot server"
+echo
+echo "a separate boot.img will need to be created in a similar fashion"
+echo "it can be stripped down to just the bare essentials for reroot"
+echo
