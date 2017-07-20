@@ -33,9 +33,18 @@ MINI_MEMSTICK_CHECKSUM=CHECKSUM.SHA512-FreeBSD-11.1-RC3-amd64
 #
 # Check for missing build packages
 #
+
 missing=0
-hash git || { echo "missing git"; : $((missing += 1)) }
-hash gmake || { echo "missing gmake"; : $((missing += 1)) }
+require() {
+    hash $1 || {
+        echo "missing $1"
+        : $((missing += 1))
+    }
+}
+
+require git
+require gmake
+
 if [ ${missing} -gt 0 ]
 then
   echo "Please install missing tools"
