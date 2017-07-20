@@ -90,9 +90,6 @@ are included in this repository, but for a quick demo you may use the boot
 server in this example.  _This server is for demonstration purposes only and
 may cease to exist at any time._
 
-As a side note, the boot server in these demos does not have a public IP
-address so is only accessible from within the Scaleway private network.
-
 [scaleway-cli]: https://github.com/scaleway/scaleway-cli
 
 ### Creating a server
