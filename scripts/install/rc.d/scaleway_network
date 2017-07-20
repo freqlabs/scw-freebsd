@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# PROVIDE: scaleway_network
+# BEFORE: NETWORKING netif routing hostname
+# REQUIRE: mountcritlocal mdconfig
+# KEYWORD: FreeBSD
+
+. /etc/rc.subr
+
+name="scaleway_network"
+start_cmd="${name}_start"
+stop_cmd=":"
+
+load_rc_config $name
+
+scaleway_network_start()
+{
+	local _ifaces _iface
+
+	_ifaces=$(ifconfig -l | sed -E 's/lo[0-9]+//g')
+
+	for _iface in ${_ifaces}
+	do
+		cat >> /etc/dhclient.conf <<- EOF
+			interface "${_iface}" { supersede broadcast-address 255.255.255.255; }
+		EOF
+		ifconfig ${_iface} | grep -q "no carrier" && continue
+		dhclient ${_iface}
+	done
+}
+
+load_rc_config $name
+run_rc_command "$1"

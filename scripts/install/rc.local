@@ -1,0 +1,65 @@
+#!/bin/sh
+# $FreeBSD: stable/11/release/rc.local 271549 2014-09-13 20:09:02Z nwhitehorn $
+
+rescue_shell() {
+	clear
+	echo "When finished, type 'exit' to return to the installer."
+	/bin/sh
+	. /etc/rc.local
+}
+
+: ${DIALOG_OK=0}
+: ${DIALOG_CANCEL=1}
+: ${DIALOG_HELP=2}
+: ${DIALOG_EXTRA=3}
+: ${DIALOG_ITEM_HELP=4}
+: ${DIALOG_ESC=255}
+
+MACHINE=`uname -m`
+
+# resolv.conf from DHCP ends up in here, so make sure the directory exists
+mkdir /tmp/bsdinstall_etc
+
+export TERM="vt100"
+
+# Fetch the install script at runtime rather than baking it into the image.
+#
+# The user may configure a custom URL to fetch the installerconfig file from by
+# by setting ``INSTALLERCONFIG_URL'' in the Scaleway userdata.  If the URL is
+# "none" or "no" or "rescue", the image drops to a shell instead.
+# As a fallback, the URL may be specified by setting ``installerconfig_url'' in 
+# ``/boot/loader.conf''.
+
+# Check Scaleway userdata for the installerconfig URL first
+config_url=$(scw-userdata INSTALLERCONFIG_URL)
+case "${config_url}" in
+	[Nn][Oo][Nn][Ee]|[Nn][Oo]|[Rr][Ee][Ss][Cc][Uu][Ee])
+		# Escape to a rescue shell if requested
+		rescue_shell
+		;;
+	"Invalid key"|"")
+		# Try try to get the installerconfig URL from loader.conf if
+		# it wasn't in the Scaleway userdata
+		if config_url=$(kenv installerconfig_url)
+		then
+			fetch -o /etc/installerconfig "${config_url}"
+		fi
+		;;
+	*)
+		# Assume ${config_url} is a valid URL to fetch
+		fetch -o /etc/installerconfig "${config_url}"
+		;;
+esac
+
+if [ -f /etc/installerconfig ]; then
+	if bsdinstall script /etc/installerconfig; then
+		dialog --backtitle "FreeBSD Installer" --title "Complete" --no-cancel --ok-label "Reboot" --pause "Installation of FreeBSD complete! Rebooting in 10 seconds" 10 30 10
+		reboot
+	else
+		dialog --backtitle "FreeBSD Installer" --title "Error" --textbox /tmp/bsdinstall_log 0 0
+	fi
+	exit 
+else
+	echo "No /etc/installerconfig found.  Dropping to a shell."
+	rescue_shell
+fi

@@ -1,0 +1,3 @@
+#!ipxe
+initrd http://scw.freqlabs.com/boot.img
+chain http://scw.freqlabs.com/memdisk harddisk raw

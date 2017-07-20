@@ -1,0 +1,46 @@
+--- /mnt/usr/share/bsdconfig/geom.subr.orig	2016-08-01 03:03:39.529380000 +0000
++++ /mnt/usr/share/bsdconfig/geom.subr	2016-08-01 03:05:24.386545000 +0000
+@@ -49,6 +49,7 @@
+ setvar GEOM_CLASS_DISK		"DISK"
+ setvar GEOM_CLASS_ELI		"ELI"
+ setvar GEOM_CLASS_FD		"FD"
++setvar GEOM_CLASS_GATE		"GATE"
+ setvar GEOM_CLASS_LABEL		"LABEL"
+ setvar GEOM_CLASS_MD		"MD"
+ setvar GEOM_CLASS_NOP		"NOP"
+--- /mnt/usr/share/bsdconfig/device.subr.orig	2016-08-01 03:05:50.231499000 +0000
++++ /mnt/usr/share/bsdconfig/device.subr	2016-08-01 03:11:39.488663000 +0000
+@@ -80,6 +80,7 @@
+ setvar DEVICE_TYPE_DISK		"DISK"		# GEOM `DISK'
+ setvar DEVICE_TYPE_FLOPPY	"FD"		# GEOM `FD'
+ setvar DEVICE_TYPE_FTP		"FTP"		# Dynamic network device
++setvar DEVICE_TYPE_GATE		"GATE"		# GEOM `GATE'
+ setvar DEVICE_TYPE_NETWORK	"NETWORK"	# See f_device_get_all_network
+ setvar DEVICE_TYPE_CDROM	"CDROM"		# GEOM `DISK'
+ setvar DEVICE_TYPE_USB		"USB"		# GEOM `PART'
+@@ -411,7 +412,7 @@
+ 	#
+ 	local retval device
+ 	case "$type" in
+-	$GEOM_CLASS_DISK)
++	$GEOM_CLASS_DISK|$GEOM_CLASS_GATE)
+ 		# First attempt to classify by device catalog (see MAIN)
+ 		case "$catalog_type" in
+ 		$DEVICE_TYPE_CDROM)
+@@ -422,10 +423,15 @@
+ 				f_media_shutdown_cdrom "" "$capacity" &&
+ 				return $SUCCESS
+ 			;;
++		$DEVICE_TYPE_GATE)
++			f_dprintf "Found GEOM Gate device named %s" "$devname"
++			;;
++		$DEVICE_TYPE_DISK)
++			f_dprintf "Found disk device named %s" "$devname"
++			;;
+ 		esac
+ 
+ 		# Fall back to register label device as a disk and taste it
+-		f_dprintf "Found disk device named %s" "$devname"
+ 		debug= f_struct "$p_provider_config" get \
+ 			ident disk_ident ||
+ 			debug= f_struct "$provider_config" get \

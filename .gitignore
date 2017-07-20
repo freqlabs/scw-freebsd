@@ -1,0 +1,4 @@
+*.img
+mfsroot*
+rootfs*
+scaleway

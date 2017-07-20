@@ -1,0 +1,22 @@
+diff --git a/skeleton-common/usr/local/sbin/scw-userdata b/skeleton-common/usr/local/sbin/scw-userdata
+index c90636a..24c93d2 100755
+--- a/skeleton-common/usr/local/sbin/scw-userdata
++++ b/skeleton-common/usr/local/sbin/scw-userdata
+@@ -9,7 +9,7 @@ USERDATA_URL=${USERDATA_URL:-"http://${USERDATA_IP}/user_data"}
+ 
+ get() {
+     URL=$1
+-    if type curl >/dev/null 2>/dev/null; then
++    if hash curl 2>/dev/null; then
+         # Using curl
+         RESPONSE=$(curl --local-port 1-1024 --noproxy '*' --silent --write-out "\n%{http_CODE}\n" $URL)
+         CODE=$(echo "$RESPONSE" | sed -n '$p')
+@@ -23,7 +23,7 @@ get() {
+ patch() {
+     URL="$1"
+     DATA="$2"
+-    if type curl >/dev/null 2>/dev/null; then
++    if hash curl 2>/dev/null; then
+         # Using curl
+         RESPONSE=$(curl --local-port 1-1024 --noproxy '*' -X PATCH -d "$DATA" -H "Content-Type: text/plain" --silent --write-out "\n%{http_CODE}\n" $URL)
+     else

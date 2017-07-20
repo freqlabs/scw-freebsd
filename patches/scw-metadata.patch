@@ -1,0 +1,57 @@
+diff --git a/skeleton-common/usr/local/bin/scw-metadata b/skeleton-common/usr/local/bin/scw-metadata
+old mode 100755
+new mode 100644
+index 55fd8e8..a51e188
+--- a/skeleton-common/usr/local/bin/scw-metadata
++++ b/skeleton-common/usr/local/bin/scw-metadata
+@@ -4,7 +4,7 @@
+ 
+ export PATH="${PATH:+$PATH:}/usr/bin:/bin"
+ 
+-CACHE_FILE=/run/scw-metadata.cache
++CACHE_FILE=/var/run/scw-metadata.cache
+ METADATA_IP=${METADATA_IP:-169.254.42.42}
+ METADATA_URL=${METADATA_URL:-"http://${METADATA_IP}/conf"}
+ 
+@@ -22,24 +22,35 @@ else
+             BODY=$(echo "$RESPONSE" | sed '$d')
+ 
+             if [ $CODE -eq 200 ]; then
+-                echo "$BODY" > /run/scw-metadata.cache
+-		ln -s scw-metadata.cache /run/oc-metadata.cache 2>/dev/null
++                echo "$BODY" > $CACHE_FILE
++                ln -s $CACHE_FILE /var/run/oc-metadata.cache 2>/dev/null
+                 break
+             fi
+             sleep 5
+         done
+-    else
++    elif hash wget 2>/dev/null; then
+         # Using wget
+         for i in 1 2 3 4 5; do
+             BODY=$(wget --no-proxy --quiet -O- $METADATA_URL)
+-	    echo "$BODY" | grep PRIVATE_IP >/dev/null
++            echo "$BODY" | grep PRIVATE_IP >/dev/null
+             if [ $? -eq 0 ]; then
+-		echo "$BODY" > /run/scw-metadata.cache
+-		ln -s scw-metadata.cache /run/oc-metadata.cache 2>/dev/null
++                echo "$BODY" > $CACHE_FILE
++                ln -s $CACHE_FILE /var/run/oc-metadata.cache 2>/dev/null
+                 break
+             fi
+             sleep 2
+         done
++    elif hash fetch 2>/dev/null; then
++        # Using fetch
++        BODY=$(fetch -o - --quiet --retry --no-proxy='*' $METADATA_URL)
++        echo "$BODY" | grep PRIVATE_IP >/dev/null
++        if [ $? -eq 0 ]; then
++            echo "$BODY" > $CACHE_FILE
++            ln -s $CACHE_FILE /var/run/oc-metadata.cache 2>/dev/null
++        fi
++    else
++        echo "failed to fetch metadata" 1>&2
++        exit 1
+     fi
+ fi
+ 
