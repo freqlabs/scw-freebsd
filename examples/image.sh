@@ -47,7 +47,7 @@
 # Modify this function to fit your needs
 upload()
 {
-        scp "${1}" "${UPLOAD_DESTINATION}"
+	scp "${1}" "${UPLOAD_DESTINATION}"
 }
 
 mount_media()
