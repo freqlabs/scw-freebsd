@@ -1,4 +1,11 @@
-#!/bin/sh
+#! /bin/sh
+#
+# Prepare install.img for booting FreeBSD on Scaleway C2 servers.
+#
+# NOTE: This script is currently incomplete! USE AT YOUR OWN RISK!
+#
+# You will likely have to customize a few parts of this script
+# in order for it to be at all useful.
 
 echo "Sorry, this script is not finished yet."
 exit 1
