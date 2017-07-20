@@ -232,10 +232,10 @@ cp scaleway/sbin/nbd-client "${root_mnt}/sbin/"
 cp scaleway/usr/sbin/scw-userdata "${root_mnt}/usr/sbin"
 
 #
-# Patch bsdinstall to add GEOM Gate support
+# Patch bsdconfig to add GEOM Gate support
 #
 
-patch -u -p2 -d "${root_mnt}" < repo/patches/bsdinstall.patch
+patch -u -p2 -d "${root_mnt}" < repo/patches/bsdconfig.patch
 
 #
 # Populate the boot image
